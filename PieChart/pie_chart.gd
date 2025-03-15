@@ -49,7 +49,7 @@ extends Control
         label_rotate_bias_angle = value
         refresh_params()
 
-@export var label_center_anchor_bias: Vector2 = Vector2(-36, 12):
+@export var label_center_anchor_bias: Vector2 = Vector2(0, 0):
     get:
         return label_center_anchor_bias
     set(value):
@@ -129,8 +129,9 @@ func draw() -> void:
             var separate_anchor:Control = Control.new()
             labels_parent_anchor.add_child(separate_anchor)
             separate_anchor.set_position(label_center_anchor_bias)
+            var percentage_string:String = str(round(normalized_share_list[i] * 100)) + "%"
             var label:Label = Label.new()
-            label.text = tag_array[i]
+            label.set_text(tag_array[i] + "\n" + percentage_string)
             label.set_horizontal_alignment(1)
             label.set_vertical_alignment(1)
             label.set_size(Vector2(1, 1))
