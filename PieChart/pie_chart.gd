@@ -85,14 +85,30 @@ var each_part_midpoint_angle_list:Array[float]
 func _ready() -> void:
     refresh_params()
 
+func set_tag_array(new_tag_array:Array) -> void:
+    var new_array:Array[String] = []
+    for element in new_tag_array:
+        new_array.append(element)
+    self.tag_array = new_array
+
+func set_value_array(new_value_array:Array) -> void:
+    var new_array:Array[float]
+    for element in new_value_array:
+        new_array.append(element)
+    self.value_array = new_array
+
 func refresh_params() -> void:
     self.using_share_num = len(tag_array)
     normalized_share_list = []
     var total_value:float = 0
     for i in range(len(value_array)):
         total_value += value_array[i]
-    for i in range(len(value_array)):
-        normalized_share_list.append(value_array[i] / total_value)
+    if total_value != 0:
+        for i in range(len(value_array)):
+            normalized_share_list.append(float(value_array[i]) / float(total_value))
+    else:
+        for i in range(len(value_array)):
+            normalized_share_list.append(1 / float(len(value_array)))
 
     each_part_midpoint_angle_list = []
     var start_angle:float = 0
@@ -124,12 +140,13 @@ func draw() -> void:
 
         for child in labels_parent_anchor.get_children():
             labels_parent_anchor.remove_child(child)
-        
+
         for i in range(self.using_share_num):
             var separate_anchor:Control = Control.new()
+            var normalized_share:float = normalized_share_list[i]
+            var percentage_string:String = str(round(normalized_share * 100)) + "%"
             labels_parent_anchor.add_child(separate_anchor)
             separate_anchor.set_position(label_center_anchor_bias)
-            var percentage_string:String = str(round(normalized_share_list[i] * 100)) + "%"
             var label:Label = Label.new()
             label.set_text(tag_array[i] + "\n" + percentage_string)
             label.set_horizontal_alignment(1)
@@ -139,7 +156,7 @@ func draw() -> void:
             label.set_custom_minimum_size(Vector2(100, 20))
             separate_anchor.add_child(label)
             label.position = Vector2(
-                cos(each_part_midpoint_angle_list[i]) * relative_size * label_radius_bias, 
+                cos(each_part_midpoint_angle_list[i]) * relative_size * label_radius_bias,
                 sin(each_part_midpoint_angle_list[i]) * relative_size * label_radius_bias
             )
 
@@ -149,10 +166,10 @@ func draw() -> void:
                 separate_anchor.rotation += designated_index_rotate_bias[i]
 
             label.rotation = -separate_anchor.rotation
-            
+
             if label_font:
                 label.add_theme_font_override("font", label_font)
-            
+
             label.add_theme_color_override("font_color", font_color)
             label.global_position -= label.get_size() / 2
 
